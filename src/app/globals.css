@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ignition: #ff5722;
+  --spec: #2dd4bf;
+  --font-display: 'Oxanium', system-ui, sans-serif;
+  --font-body: 'Manrope', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: #06070a;
+  color: #e7e9ec;
+  font-family: var(--font-body), system-ui, sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: rgba(255, 87, 34, 0.3);
+  color: #fff;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #06070a;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(#23292f, #14181d);
+  border-radius: 8px;
+  border: 2px solid #06070a;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5722;
+}
+
+@layer components {
+  .panel {
+    @apply relative rounded-2xl border border-line bg-ink-850/80 backdrop-blur-sm;
+  }
+
+  .hud-label {
+    @apply font-mono text-[10px] uppercase tracking-ultra text-white/40;
+  }
+
+  .btn-ignition {
+    @apply relative inline-flex items-center justify-center gap-2 rounded-full bg-ignition px-7 py-3 font-display font-semibold uppercase tracking-wider text-ink-950 transition-all duration-300;
+  }
+  .btn-ignition:hover {
+    box-shadow: 0 0 40px -6px rgba(255, 87, 34, 0.7);
+    transform: translateY(-1px);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-line px-7 py-3 font-display font-medium uppercase tracking-wider text-white/80 transition-all duration-300 hover:border-white/30 hover:bg-white/5;
+  }
+
+  .gradient-text {
+    background: linear-gradient(110deg, #ff7a45 0%, #ff5722 45%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-line bg-ink-900/80 px-4 py-3 font-sans text-white placeholder-white/30 outline-none transition-all duration-200 focus:border-ignition/60 focus:bg-ink-850;
+  }
+
+  .blueprint {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+}
+
+/* Film grain overlay */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    rgba(255, 255, 255, 0.9) 50%,
+    rgba(255, 255, 255, 0.25) 100%
+  );
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.blur-locked {
+  filter: blur(7px);
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Range sliders */
+.range-ignition {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 87, 34, 0.5), rgba(45, 212, 191, 0.35));
+  outline: none;
+}
+.range-ignition::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff5722;
+  border: 2px solid #0a0c10;
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.25), 0 0 14px rgba(255, 90, 31, 0.6);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.range-ignition::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+.range-ignition::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff5722;
+  border: 2px solid #0a0c10;
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.25);
+  cursor: pointer;
+}
+
+/* Accordion */
+.accordion-chevron {
+  transition: transform 0.3s ease;
+}
+.accordion-open .accordion-chevron {
+  transform: rotate(180deg);
+}
