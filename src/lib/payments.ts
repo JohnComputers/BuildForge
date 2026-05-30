@@ -41,7 +41,7 @@ export function buildCheckoutUrl(plan: Plan): string {
   params.set('redirect_url', successUrl(plan));
 
   // If the placeholder hasn't been replaced yet, return a marker the UI can detect.
-  if (link === 'FULL_BUILD_PAYMENT_LINK' || link === 'PRO_BUILD_PAYMENT_LINK') {
+  if (link === 'https://square.link/u/AQQ51sIh' || link === 'https://square.link/u/4eNf86gL') {
     return `#payment-link-not-configured-${plan}`;
   }
 
