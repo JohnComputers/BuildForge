@@ -260,7 +260,7 @@ export default function HomePage() {
                 <div className="mt-3 font-display text-4xl font-bold text-white">$0</div>
                 <p className="mt-2 text-sm text-white/55">See the shape of your build at no cost.</p>
                 <ul className="mt-6 space-y-2 text-sm text-white/60">
-                  <li>First 2 modifications visible</li>
+                  <li>First 4 modifications visible</li>
                   <li>Live cost + HP preview</li>
                   <li>Remaining stages blurred</li>
                 </ul>

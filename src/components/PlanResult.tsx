@@ -7,7 +7,7 @@ import type { BuildPlan } from '@/lib/types';
 import { BUILD_TYPES } from '@/lib/planner';
 import { HpGauge, BudgetBars, LiveNumber } from './Effects';
 import { getUnlock } from '@/lib/storage';
-import { buildCheckoutUrl, isConfigured, type Plan } from '@/lib/payments';
+import { buildCheckoutUrl, isConfigured, PLAN_PRICE, type Plan } from '@/lib/payments';
 import { generatePdf } from '@/lib/pdf';
 
 const CAT_COLORS: Record<string, string> = {
@@ -31,6 +31,9 @@ const CAT_COLORS: Record<string, string> = {
 function money(n: number) {
   return '$' + Math.round(n).toLocaleString('en-US');
 }
+
+// How many roadmap stages are visible before unlocking.
+const FREE_STAGES = 4;
 
 export default function PlanResult({ plan }: { plan: BuildPlan }) {
   const [unlock, setUnlock] = useState({ full: false, pro: false });
@@ -92,7 +95,7 @@ export default function PlanResult({ plan }: { plan: BuildPlan }) {
 
         <div className="space-y-3">
           {plan.stages.map((s, i) => {
-            const locked = !fullUnlocked && i >= 2;
+            const locked = !fullUnlocked && i >= FREE_STAGES;
             return (
               <motion.div
                 key={s.stage}
@@ -124,21 +127,22 @@ export default function PlanResult({ plan }: { plan: BuildPlan }) {
         </div>
 
         {/* lock overlay */}
-        {mounted && !fullUnlocked && plan.stages.length > 2 && (
+        {mounted && !fullUnlocked && plan.stages.length > FREE_STAGES && (
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             className="mt-5 flex flex-col items-center gap-3 rounded-2xl border border-ignition/30 bg-ignition/5 p-6 text-center"
           >
             <p className="hud-label text-ignition-400">
-              {plan.stages.length - 2} more stages locked
+              {plan.stages.length - FREE_STAGES} more{' '}
+              {plan.stages.length - FREE_STAGES === 1 ? 'stage' : 'stages'} locked
             </p>
             <p className="max-w-md text-sm text-white/70">
               Unlock the complete roadmap, full budget breakdown, HP curve, and a printable PDF.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <button onClick={() => buy('full')} className="btn-ignition text-sm">
-                Unlock Full Plan — $9.99
+                Unlock Full Plan — ${PLAN_PRICE.full}
               </button>
               <Link href="/pricing" className="btn-ghost text-sm">
                 Compare Plans
@@ -230,16 +234,16 @@ export default function PlanResult({ plan }: { plan: BuildPlan }) {
                   Download PDF
                 </button>
                 <button onClick={() => buy('pro')} className="btn-ghost w-full text-sm">
-                  Upgrade to Pro — $19.99
+                  Upgrade to Pro — ${PLAN_PRICE.pro}
                 </button>
               </>
             ) : (
               <>
                 <button onClick={() => buy('full')} className="btn-ignition w-full text-sm">
-                  Get Full Plan — $9.99
+                  Get Full Plan — ${PLAN_PRICE.full}
                 </button>
                 <button onClick={() => buy('pro')} className="btn-ghost w-full text-sm">
-                  Get Pro — $19.99
+                  Get Pro — ${PLAN_PRICE.pro}
                 </button>
               </>
             )}

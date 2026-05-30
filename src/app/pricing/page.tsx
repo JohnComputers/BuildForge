@@ -13,7 +13,7 @@ const PLANS = [
     price: 0,
     blurb: 'See the shape of your build before committing a dollar.',
     features: [
-      'First 2 modifications visible',
+      'First 4 modifications visible',
       'Live cost + HP preview',
       'Remaining stages blurred',
       'Unlimited previews',

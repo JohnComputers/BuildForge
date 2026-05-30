@@ -10,8 +10,8 @@ export const PRO_BUILD_PAYMENT_LINK: string = 'PRO_BUILD_PAYMENT_LINK';
 export type Plan = 'full' | 'pro';
 
 export const PLAN_PRICE: Record<Plan, number> = {
-  full: 9.99,
-  pro: 19.99,
+  full: 4.99,
+  pro: 9.99,
 };
 
 function basePath(): string {
