@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { Reveal, TiltCard } from '@/components/Effects';
-import { PLAN_PRICE, buildCheckoutUrl, isConfigured, type Plan } from '@/lib/payments';
+import { PLAN_PRICE, type Plan } from '@/lib/payments';
+import { useCheckout } from '@/lib/checkout';
 
 const PLANS = [
   {
@@ -52,21 +53,17 @@ const PLANS = [
 ];
 
 export default function PricingPage() {
-  const [note, setNote] = useState('');
+  const { startCheckout, busy, error } = useCheckout();
 
   useEffect(() => {
     document.title = 'Pricing · BuildForge AI';
   }, []);
 
   function buy(plan: Plan) {
-    if (!isConfigured(plan)) {
-      setNote(
-        'Payment links are not configured in this deployment yet. Replace FULL_BUILD_PAYMENT_LINK / PRO_BUILD_PAYMENT_LINK in src/lib/payments.ts with your Square links.',
-      );
-      return;
-    }
-    window.open(buildCheckoutUrl(plan), '_blank', 'noopener,noreferrer');
+    startCheckout(plan);
   }
+
+  const note = error;
 
   return (
     <div className="px-5 py-16">
@@ -133,11 +130,12 @@ export default function PricingPage() {
                 ) : (
                   <button
                     onClick={() => buy(p.id as Plan)}
-                    className={`mt-7 flex w-full justify-center ${
+                    disabled={busy !== null}
+                    className={`mt-7 flex w-full justify-center disabled:opacity-60 ${
                       p.highlight ? 'btn-ignition' : 'btn-ghost'
                     }`}
                   >
-                    {p.cta}
+                    {busy === p.id ? 'Starting checkout…' : p.cta}
                   </button>
                 )}
               </TiltCard>

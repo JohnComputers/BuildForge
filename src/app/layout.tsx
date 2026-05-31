@@ -4,6 +4,7 @@ import Background from '@/components/Background';
 import Nav from '@/components/Nav';
 import Footer from '@/components/Footer';
 import ReferralCapture from '@/components/ReferralCapture';
+import { AuthProvider } from '@/lib/auth';
 
 export const metadata: Metadata = {
   title: 'BuildForge AI — Plan Your Dream Build Before Spending a Dollar',
@@ -24,11 +25,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="grain min-h-screen antialiased">
-        <Background />
-        <ReferralCapture />
-        <Nav />
-        <main className="relative z-10 pt-20">{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Background />
+          <ReferralCapture />
+          <Nav />
+          <main className="relative z-10 pt-20">{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

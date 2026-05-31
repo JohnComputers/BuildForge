@@ -1,4 +1,6 @@
 import { getReferral } from './storage';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from './firebase';
 
 // ─────────────────────────────────────────────────────────────
 // Replace these two placeholders with your real Square payment links.
@@ -41,7 +43,7 @@ export function buildCheckoutUrl(plan: Plan): string {
   params.set('redirect_url', successUrl(plan));
 
   // If the placeholder hasn't been replaced yet, return a marker the UI can detect.
-  if (link === 'https://square.link/u/AQQ51sIh' || link === 'https://square.link/u/4eNf86gL') {
+  if (link === 'FULL_BUILD_PAYMENT_LINK' || link === 'PRO_BUILD_PAYMENT_LINK') {
     return `#payment-link-not-configured-${plan}`;
   }
 
@@ -52,4 +54,16 @@ export function buildCheckoutUrl(plan: Plan): string {
 export function isConfigured(plan: Plan): boolean {
   const link = plan === 'pro' ? PRO_BUILD_PAYMENT_LINK : FULL_BUILD_PAYMENT_LINK;
   return link !== 'FULL_BUILD_PAYMENT_LINK' && link !== 'PRO_BUILD_PAYMENT_LINK';
+}
+
+/**
+ * Secure path: ask the Cloud Functions backend to create a Square checkout
+ * bound to the signed-in user and a server-side price. Returns the URL to open.
+ */
+export async function createSecureCheckout(plan: Plan): Promise<string> {
+  if (!functions) throw new Error('Secure backend is not configured.');
+  const call = httpsCallable<{ plan: Plan }, { url: string }>(functions, 'createCheckout');
+  const result = await call({ plan });
+  if (!result.data || !result.data.url) throw new Error('No checkout URL returned.');
+  return result.data.url;
 }

@@ -7,7 +7,9 @@ import type { BuildPlan } from '@/lib/types';
 import { BUILD_TYPES } from '@/lib/planner';
 import { HpGauge, BudgetBars, LiveNumber } from './Effects';
 import { getUnlock } from '@/lib/storage';
-import { buildCheckoutUrl, isConfigured, PLAN_PRICE, type Plan } from '@/lib/payments';
+import { useAuth } from '@/lib/auth';
+import { PLAN_PRICE, type Plan } from '@/lib/payments';
+import { useCheckout } from '@/lib/checkout';
 import { generatePdf } from '@/lib/pdf';
 
 const CAT_COLORS: Record<string, string> = {
@@ -36,6 +38,7 @@ function money(n: number) {
 const FREE_STAGES = 4;
 
 export default function PlanResult({ plan }: { plan: BuildPlan }) {
+  const { tier } = useAuth();
   const [unlock, setUnlock] = useState({ full: false, pro: false });
   const [mounted, setMounted] = useState(false);
 
@@ -44,8 +47,8 @@ export default function PlanResult({ plan }: { plan: BuildPlan }) {
     setMounted(true);
   }, []);
 
-  const fullUnlocked = unlock.full;
-  const proUnlocked = unlock.pro;
+  const fullUnlocked = unlock.full || tier === 'full' || tier === 'pro';
+  const proUnlocked = unlock.pro || tier === 'pro';
   const buildLabel = BUILD_TYPES.find((b) => b.id === plan.buildType)?.label ?? plan.buildType;
 
   const segments = plan.stages.map((s) => ({
@@ -54,15 +57,10 @@ export default function PlanResult({ plan }: { plan: BuildPlan }) {
     color: CAT_COLORS[s.mod.category] ?? '#ff5722',
   }));
 
+  const { startCheckout, busy, error: checkoutError } = useCheckout();
+
   function buy(p: Plan) {
-    const url = buildCheckoutUrl(p);
-    if (!isConfigured(p)) {
-      alert(
-        'Square payment link not configured yet.\n\nReplace FULL_BUILD_PAYMENT_LINK / PRO_BUILD_PAYMENT_LINK in src/lib/payments.ts with your real Square links to enable checkout.',
-      );
-      return;
-    }
-    window.open(url, '_blank', 'noopener,noreferrer');
+    startCheckout(p);
   }
 
   return (
@@ -141,13 +139,20 @@ export default function PlanResult({ plan }: { plan: BuildPlan }) {
               Unlock the complete roadmap, full budget breakdown, HP curve, and a printable PDF.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
-              <button onClick={() => buy('full')} className="btn-ignition text-sm">
-                Unlock Full Plan — ${PLAN_PRICE.full}
+              <button
+                onClick={() => buy('full')}
+                disabled={busy !== null}
+                className="btn-ignition text-sm disabled:opacity-60"
+              >
+                {busy === 'full' ? 'Starting checkout…' : `Unlock Full Plan — $${PLAN_PRICE.full}`}
               </button>
               <Link href="/pricing" className="btn-ghost text-sm">
                 Compare Plans
               </Link>
             </div>
+            {checkoutError && (
+              <p className="mt-1 text-xs text-ignition-400">{checkoutError}</p>
+            )}
           </motion.div>
         )}
 

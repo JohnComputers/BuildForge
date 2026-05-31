@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth';
 
 const LINKS = [
   { href: '/', label: 'Home' },
@@ -18,6 +19,8 @@ export default function Nav() {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { user, tier, configured, signOut } = useAuth();
+  const [acct, setAcct] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -76,7 +79,60 @@ export default function Nav() {
           ))}
         </div>
 
-        <div className="hidden lg:block">
+        <div className="hidden items-center gap-2 lg:flex">
+          {configured && user ? (
+            <div className="relative">
+              <button
+                onClick={() => setAcct((v) => !v)}
+                className="flex items-center gap-2 rounded-full border border-line bg-ink-850 py-1.5 pl-1.5 pr-3 text-sm text-white/80 transition hover:border-white/20"
+              >
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ignition/20 font-mono text-xs text-ignition-400">
+                  {(user.displayName || user.email || '?')[0].toUpperCase()}
+                </span>
+                <span className="max-w-[8rem] truncate">{user.displayName || user.email}</span>
+              </button>
+              <AnimatePresence>
+                {acct && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    className="absolute right-0 mt-2 w-52 overflow-hidden rounded-xl border border-line bg-ink-850 p-1.5 shadow-panel"
+                  >
+                    <div className="px-3 py-2">
+                      <div className="hud-label text-white/40">Plan</div>
+                      <div className="mt-0.5 font-display text-sm font-semibold capitalize text-white">
+                        {tier === 'free' ? 'Free' : tier === 'pro' ? 'Performance Pro' : 'Full Build'}
+                      </div>
+                    </div>
+                    <Link
+                      href="/planner"
+                      onClick={() => setAcct(false)}
+                      className="block rounded-lg px-3 py-2 text-sm text-white/75 hover:bg-ink-800"
+                    >
+                      My builds
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setAcct(false);
+                        signOut();
+                      }}
+                      className="block w-full rounded-lg px-3 py-2 text-left text-sm text-white/75 hover:bg-ink-800"
+                    >
+                      Sign out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : configured ? (
+            <Link
+              href="/login"
+              className="rounded-full border border-line px-4 py-2 text-sm text-white/80 transition hover:border-white/20"
+            >
+              Log in
+            </Link>
+          ) : null}
           <Link href="/planner" className="btn-ignition text-sm">
             Start Building
           </Link>
@@ -129,6 +185,25 @@ export default function Nav() {
               <Link href="/planner" className="btn-ignition mt-2 w-full">
                 Start Building
               </Link>
+              {configured &&
+                (user ? (
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      signOut();
+                    }}
+                    className="mt-1 block rounded-lg px-4 py-3 text-left font-display uppercase tracking-wide text-white/70"
+                  >
+                    Sign out
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="mt-1 block rounded-lg px-4 py-3 font-display uppercase tracking-wide text-white/70"
+                  >
+                    Log in
+                  </Link>
+                ))}
             </div>
           </motion.div>
         )}
