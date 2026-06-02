@@ -6,8 +6,8 @@ import { functions } from './firebase';
 // Replace these two placeholders with your real Square payment links.
 // Create them at: Square Dashboard → Online → Payment Links.
 // ─────────────────────────────────────────────────────────────
-export const FULL_BUILD_PAYMENT_LINK: string = 'FULL_BUILD_PAYMENT_LINK';
-export const PRO_BUILD_PAYMENT_LINK: string = 'PRO_BUILD_PAYMENT_LINK';
+export const FULL_BUILD_PAYMENT_LINK: string = 'https://square.link/u/AQQ51sIh';
+export const PRO_BUILD_PAYMENT_LINK: string = 'https://square.link/u/4eNf86gL';
 
 export type Plan = 'full' | 'pro';
 
